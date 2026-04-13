@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background: rounded square, Telegram blue -->
+  <rect width="512" height="512" rx="115" fill="#2AABEE"/>
+
+  <!-- Telegram paper plane (white) -->
+  <path d="M96 256 L416 120 L316 400 L236 308 Z" fill="white" opacity="0.95"/>
+  <path d="M236 308 L220 370 L196 318 Z" fill="#d0eeff"/>
+  <path d="M236 308 L316 400 L260 340 Z" fill="#b8e0f7"/>
+
+  <!-- MAX badge: orange circle bottom-right -->
+  <circle cx="370" cy="370" r="110" fill="#FF8C00"/>
+
+  <!-- Letter M in white inside badge -->
+  <text x="370" y="415" text-anchor="middle"
+        font-family="Arial Black, Arial, sans-serif"
+        font-weight="900" font-size="130" fill="white">M</text>
+</svg>
