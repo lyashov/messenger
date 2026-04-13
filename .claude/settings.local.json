@@ -25,7 +25,16 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://ai-rt.ru)",
       "Bash(npm install:*)",
       "Bash(npm run:*)",
-      "Bash(sshpass -e scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -O -r /Users/evgeniiliashov/Documents/AI/messenger/frontend /Users/evgeniiliashov/Documents/AI/messenger/src /Users/evgeniiliashov/Documents/AI/messenger/Dockerfile /Users/evgeniiliashov/Documents/AI/messenger/.gitignore /Users/evgeniiliashov/Documents/AI/messenger/deploy root@213.171.4.237:/opt/messenger/)"
+      "Bash(sshpass -e scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -O -r /Users/evgeniiliashov/Documents/AI/messenger/frontend /Users/evgeniiliashov/Documents/AI/messenger/src /Users/evgeniiliashov/Documents/AI/messenger/Dockerfile /Users/evgeniiliashov/Documents/AI/messenger/.gitignore /Users/evgeniiliashov/Documents/AI/messenger/deploy root@213.171.4.237:/opt/messenger/)",
+      "Bash(sshpass -e scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -O -r /Users/evgeniiliashov/Documents/AI/messenger/frontend root@213.171.4.237:/opt/messenger/)",
+      "Bash(sshpass -e rsync -avz --exclude=node_modules -e 'ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no' /Users/evgeniiliashov/Documents/AI/messenger/frontend/ root@213.171.4.237:/opt/messenger/frontend/)",
+      "Bash(sshpass -e rsync -avz -e 'ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no' /Users/evgeniiliashov/Documents/AI/messenger/Dockerfile /Users/evgeniiliashov/Documents/AI/messenger/.gitignore root@213.171.4.237:/opt/messenger/)",
+      "Bash(sshpass -e rsync -avz -e 'ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no' /Users/evgeniiliashov/Documents/AI/messenger/src/ root@213.171.4.237:/opt/messenger/src/)",
+      "Bash(sshpass -e rsync -avz -e 'ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no' /Users/evgeniiliashov/Documents/AI/messenger/deploy/ root@213.171.4.237:/opt/messenger/deploy/)",
+      "Bash(sshpass -e rsync -avz -e 'ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no' /Users/evgeniiliashov/Documents/AI/messenger/.dockerignore root@213.171.4.237:/opt/messenger/)",
+      "Bash(sshpass -e ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o ServerAliveInterval=30 root@213.171.4.237 ':*)",
+      "Bash(curl -s https://ai-rt.ru)",
+      "Bash(sshpass -e ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o ServerAliveInterval=15 root@213.171.4.237 ':*)"
     ]
   }
 }

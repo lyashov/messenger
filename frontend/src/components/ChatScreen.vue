@@ -11,13 +11,13 @@
         <div class="chat-header-actions">
           <button
             v-if="!inCall"
-            class="header-btn call-btn"
+            class="call-btn"
             @click="handleStartCall"
             title="Начать звонок"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M15.05 5A5 5 0 0119 8.95M15.05 1A9 9 0 0123 8.94M23 7l-7 5 7 5V7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
               <rect x="1" y="5" width="15" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+              <path d="M23 7l-7 5 7 5V7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             <span>Позвонить</span>
           </button>
@@ -25,14 +25,17 @@
       </div>
 
       <div class="chat-messages" ref="messagesEl">
-        <div class="messages-spacer"></div>
-        <MessageBubble
-          v-for="(m, i) in messages"
-          :key="i"
-          :msg="m"
-          :isMine="m.nickname === nickname"
-          :color="getColor(m.nickname)"
-        />
+        <ChatWallpaper />
+        <div class="messages-inner">
+          <div class="messages-spacer"></div>
+          <MessageBubble
+            v-for="(m, i) in messages"
+            :key="i"
+            :msg="m"
+            :isMine="m.nickname === nickname"
+            :color="getColor(m.nickname)"
+          />
+        </div>
       </div>
 
       <div class="chat-input-area">
@@ -79,6 +82,7 @@ import { useWebRTC } from '../composables/useWebRTC.js'
 import Sidebar from './Sidebar.vue'
 import MessageBubble from './MessageBubble.vue'
 import CallOverlay from './CallOverlay.vue'
+import ChatWallpaper from './ChatWallpaper.vue'
 
 const {
   nickname, messages, users,
@@ -173,40 +177,51 @@ watch(messages, () => {
   font-size: 15px;
   font-weight: 600;
   line-height: 1.2;
+  color: var(--tg-text-header);
 }
 
 .chat-header-status {
   font-size: 13px;
-  color: var(--tg-text-secondary);
+  color: var(--tg-text-header);
+  opacity: 0.7;
 }
 
-.header-btn {
+.call-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
+  gap: 8px;
+  padding: 10px 20px;
   border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--tg-blue);
+  border-radius: 24px;
+  background: #fff;
+  color: var(--tg-bg-header);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.header-btn:hover {
-  background: var(--tg-bg-hover);
+.call-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 8px 12px;
+  position: relative;
+  background: var(--tg-wallpaper-color);
+}
+
+.messages-inner {
+  position: relative;
+  z-index: 1;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  background: var(--tg-bg-secondary);
+  padding: 8px 12px;
 }
 
 .messages-spacer {

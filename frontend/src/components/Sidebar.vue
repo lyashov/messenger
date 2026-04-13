@@ -33,6 +33,16 @@
     </div>
 
     <div class="sidebar-footer">
+      <button class="theme-btn" @click="toggleTheme">
+        <svg v-if="theme === 'light'" width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/>
+          <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.73 12.73l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        {{ theme === 'light' ? 'Тёмная тема' : 'Светлая тема' }}
+      </button>
       <button class="leave-btn" @click="$emit('leave')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m7 14l5-5-5-5m5 5H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -45,9 +55,11 @@
 
 <script setup>
 import { useWebSocket } from '../composables/useWebSocket.js'
+import { useTheme } from '../composables/useTheme.js'
 
 defineEmits(['leave'])
 const { users, nickname } = useWebSocket()
+const { theme, toggleTheme } = useTheme()
 
 const colors = [
   '#e17076', '#7bc862', '#e5ca77', '#65aadd',
@@ -171,6 +183,27 @@ function getColor(name) {
 .sidebar-footer {
   padding: 12px 16px;
   border-top: 1px solid var(--tg-border);
+}
+
+.theme-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--tg-text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 4px;
+}
+
+.theme-btn:hover {
+  background: var(--tg-bg-hover);
+  color: var(--tg-blue);
 }
 
 .leave-btn {

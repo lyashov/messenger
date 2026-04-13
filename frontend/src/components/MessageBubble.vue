@@ -38,9 +38,10 @@ function formatTime(ts) {
   display: inline-block;
   padding: 4px 12px;
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.25);
-  color: var(--tg-text-secondary);
+  background: rgba(0, 0, 0, 0.15);
+  color: #fff;
   font-size: 13px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 .msg-row {
@@ -76,11 +77,16 @@ function formatTime(ts) {
   background: var(--tg-bg-msg-in);
   position: relative;
   min-width: 80px;
+  box-shadow: 0 1px 2px var(--tg-msg-shadow);
 }
 
 .msg-bubble.mine {
   background: var(--tg-bg-msg-out);
   border-radius: 12px 12px 4px 12px;
+}
+
+.msg-bubble.mine {
+  box-shadow: 0 1px 2px var(--tg-msg-shadow);
 }
 
 .msg-name {
@@ -106,6 +112,6 @@ function formatTime(ts) {
 }
 
 .msg-bubble.mine .msg-time {
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--tg-text-msg-time-out);
 }
 </style>

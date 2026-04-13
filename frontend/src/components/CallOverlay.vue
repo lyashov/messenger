@@ -1,6 +1,12 @@
 <template>
   <div class="call-overlay">
     <div class="call-header">
+      <button class="back-btn" @click="endCall" title="Вернуться в чат">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M19 12H5m7-7l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Выйти</span>
+      </button>
       <span class="call-title">Видеозвонок</span>
       <span class="call-duration">{{ formattedDuration }}</span>
     </div>
@@ -121,11 +127,30 @@ function endCall() { emit('endCall') }
 }
 
 .call-header {
-  padding: 16px 24px;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 16px;
   background: rgba(0, 0, 0, 0.3);
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .call-title {
@@ -135,8 +160,9 @@ function endCall() { emit('endCall') }
 
 .call-duration {
   font-size: 14px;
-  color: var(--tg-text-secondary);
+  color: rgba(255, 255, 255, 0.6);
   font-variant-numeric: tabular-nums;
+  margin-left: auto;
 }
 
 .call-grid {

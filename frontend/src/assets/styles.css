@@ -1,4 +1,31 @@
-:root {
+:root,
+[data-theme="light"] {
+  --tg-bg: #ffffff;
+  --tg-bg-secondary: #eee;
+  --tg-bg-sidebar: #ffffff;
+  --tg-bg-header: #4a9fe7;
+  --tg-bg-input: #f0f0f0;
+  --tg-bg-msg-out: #EFFDDE;
+  --tg-bg-msg-in: #ffffff;
+  --tg-bg-hover: #f0f4f8;
+  --tg-blue: #3390ec;
+  --tg-blue-dark: #2b7cd3;
+  --tg-green: #4dcd5e;
+  --tg-text: #000000;
+  --tg-text-header: #ffffff;
+  --tg-text-secondary: #708499;
+  --tg-text-msg-time: #8eb1c7;
+  --tg-text-msg-time-out: #6eb06e;
+  --tg-border: #e0e0e0;
+  --tg-red: #e53935;
+  --tg-scrollbar: #c4c9cc;
+  --tg-wallpaper-color: #a8d4a2;
+  --tg-wallpaper-pattern: rgba(90, 145, 85, 0.12);
+  --tg-msg-name: #3390ec;
+  --tg-msg-shadow: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] {
   --tg-bg: #17212b;
   --tg-bg-secondary: #0e1621;
   --tg-bg-sidebar: #17212b;
@@ -11,11 +38,17 @@
   --tg-blue-dark: #3a7bd5;
   --tg-green: #4dcd5e;
   --tg-text: #f5f5f5;
+  --tg-text-header: #f5f5f5;
   --tg-text-secondary: #708499;
   --tg-text-msg-time: #6d8da0;
+  --tg-text-msg-time-out: rgba(255, 255, 255, 0.45);
   --tg-border: #0e1621;
   --tg-red: #e53935;
   --tg-scrollbar: #3b4654;
+  --tg-wallpaper-color: #0e1621;
+  --tg-wallpaper-pattern: rgba(100, 150, 180, 0.08);
+  --tg-msg-name: #5eaaec;
+  --tg-msg-shadow: none;
 }
 
 * {
