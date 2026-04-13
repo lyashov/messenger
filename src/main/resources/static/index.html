@@ -226,6 +226,9 @@
                     case 'ice':
                         handleIce(msg);
                         break;
+                    case 'hangup':
+                        handleRemoteHangup(msg);
+                        break;
                 }
             }
 
@@ -384,6 +387,14 @@
             }
 
             function endCall() {
+                // Notify all peers that we're hanging up
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ type: 'hangup', nickname: nickname.value }));
+                }
+                closeAllPeers();
+            }
+
+            function closeAllPeers() {
                 for (const nick of Object.keys(peerConnections)) {
                     removePeer(nick);
                 }
@@ -392,6 +403,14 @@
                     localStream.value = null;
                 }
                 inCall.value = false;
+            }
+
+            function handleRemoteHangup(msg) {
+                removePeer(msg.nickname);
+                // If no more remote peers, end the call entirely
+                if (Object.keys(peerConnections).length === 0 && inCall.value) {
+                    closeAllPeers();
+                }
             }
 
             function toggleAudio() {
@@ -415,7 +434,7 @@
             }
 
             function cleanup() {
-                endCall();
+                closeAllPeers();
             }
 
             return {
