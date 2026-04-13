@@ -38,7 +38,19 @@
       "Bash(sshpass -e rsync -avz --delete -e 'ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no' /Users/evgeniiliashov/Documents/AI/messenger/src/main/resources/static/ root@213.171.4.237:/opt/messenger/src/main/resources/static/)",
       "Bash(git add:*)",
       "Bash(git commit -m ':*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no -o ConnectTimeout=10 root@213.171.4.237 \"systemctl status webhook.service\")",
+      "Bash(sshpass -p 'agA+WN#L_P9e,6' ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no -o StrictHostKeyChecking=no root@213.171.4.237 \"systemctl status webhook.service 2>&1; echo '---'; ss -tlnp | grep 9000; echo '---'; cat /opt/messenger/deploy/deploy.sh 2>&1; echo '---'; cat /opt/messenger/deploy/webhook.py 2>&1\")",
+      "Bash(sshpass -p 'agA+WN#L_P9e,6' ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no -o StrictHostKeyChecking=no root@213.171.4.237 \"journalctl -u webhook.service -n 30 --no-pager 2>&1; echo '==='; ufw status 2>&1 || iptables -L INPUT -n 2>&1\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" -X POST http://213.171.4.237:9000/webhook -H \"Content-Type: application/json\" -H \"X-GitHub-Event: ping\" -d '{}')",
+      "Bash(gh api:*)",
+      "Bash(sshpass -p 'agA+WN#L_P9e,6' ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no -o StrictHostKeyChecking=no root@213.171.4.237 \"cd /opt/messenger && git pull origin master 2>&1\")",
+      "Bash(sshpass -p 'agA+WN#L_P9e,6' ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no -o StrictHostKeyChecking=no root@213.171.4.237 \"cd /opt/messenger && git checkout -- . && git clean -fd && git pull origin master 2>&1\")",
+      "Bash(sshpass -p 'agA+WN#L_P9e,6' ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no -o StrictHostKeyChecking=no root@213.171.4.237 \"cd /opt/messenger && nohup docker compose up -d --build > /tmp/deploy.log 2>&1 &\")",
+      "Bash(sshpass -p 'agA+WN#L_P9e,6' ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no -o StrictHostKeyChecking=no root@213.171.4.237 \"tail -30 /tmp/deploy.log 2>&1; echo '==='; docker ps 2>&1\")",
+      "Bash(node -e \"require\\('sharp'\\)\")",
+      "Bash(node -e ':*)",
+      "Bash(npm list:*)"
     ]
   }
 }
