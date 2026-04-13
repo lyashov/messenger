@@ -10,6 +10,7 @@ const rtcConfig = {
 const inCall = ref(false)
 const audioEnabled = ref(true)
 const videoEnabled = ref(true)
+const screenSharing = ref(false)
 const localStream = ref(null)
 const peerConnections = {}
 const remoteStreams = reactive({})
@@ -71,6 +72,7 @@ export function useWebRTC(sendSignal, nickname, users) {
     inCall.value = false
     audioEnabled.value = true
     videoEnabled.value = true
+    screenSharing.value = false
   }
 
   async function startCall() {
@@ -184,10 +186,72 @@ export function useWebRTC(sendSignal, nickname, users) {
     }
   }
 
+  async function toggleScreenShare() {
+    if (screenSharing.value) {
+      // Stop screen sharing, revert to camera
+      try {
+        const camStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+        const newVideoTrack = camStream.getVideoTracks()[0]
+        const newAudioTrack = camStream.getAudioTracks()[0]
+
+        // Stop old screen tracks
+        localStream.value.getVideoTracks().forEach(t => t.stop())
+
+        // Replace tracks in local stream
+        const oldVideoTrack = localStream.value.getVideoTracks()[0]
+        if (oldVideoTrack) localStream.value.removeTrack(oldVideoTrack)
+        localStream.value.addTrack(newVideoTrack)
+
+        // Replace in all peer connections
+        for (const pc of Object.values(peerConnections)) {
+          const senders = pc.getSenders()
+          const videoSender = senders.find(s => s.track && s.track.kind === 'video')
+          if (videoSender) await videoSender.replaceTrack(newVideoTrack)
+        }
+
+        // Stop extra audio track from camStream (we keep existing audio)
+        newAudioTrack.stop()
+      } catch (e) {
+        console.error('Failed to revert to camera:', e)
+      }
+      screenSharing.value = false
+    } else {
+      // Start screen sharing
+      try {
+        const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true })
+        const screenTrack = screenStream.getVideoTracks()[0]
+
+        // When user clicks browser's "Stop sharing" button
+        screenTrack.onended = () => {
+          toggleScreenShare() // revert to camera
+        }
+
+        // Stop current camera video track
+        localStream.value.getVideoTracks().forEach(t => t.stop())
+
+        // Replace in local stream
+        const oldVideoTrack = localStream.value.getVideoTracks()[0]
+        if (oldVideoTrack) localStream.value.removeTrack(oldVideoTrack)
+        localStream.value.addTrack(screenTrack)
+
+        // Replace in all peer connections
+        for (const pc of Object.values(peerConnections)) {
+          const senders = pc.getSenders()
+          const videoSender = senders.find(s => s.track && s.track.kind === 'video')
+          if (videoSender) await videoSender.replaceTrack(screenTrack)
+        }
+
+        screenSharing.value = true
+      } catch (e) {
+        console.error('Screen share cancelled or failed:', e)
+      }
+    }
+  }
+
   return {
-    inCall, audioEnabled, videoEnabled, localStream,
+    inCall, audioEnabled, videoEnabled, screenSharing, localStream,
     remoteStreams, videoCount,
     startCall, endCall, handleSignal,
-    toggleAudio, toggleVideo, closeAllPeers
+    toggleAudio, toggleVideo, toggleScreenShare, closeAllPeers
   }
 }

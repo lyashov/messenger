@@ -1,9 +1,15 @@
 <template>
   <div class="chat-layout">
-    <Sidebar @leave="handleLeave" />
+    <div class="sidebar-overlay" :class="{ visible: sidebarOpen }" @click="sidebarOpen = false"></div>
+    <Sidebar :class="{ open: sidebarOpen }" @leave="handleLeave" />
 
     <div class="chat-main">
       <div class="chat-header">
+        <button class="menu-btn" @click="sidebarOpen = !sidebarOpen">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
         <div class="chat-header-info">
           <h2>Комната</h2>
           <span class="chat-header-status">{{ users.length }} участник{{ plural(users.length) }}</span>
@@ -19,7 +25,7 @@
               <rect x="1" y="5" width="15" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
               <path d="M23 7l-7 5 7 5V7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <span>Позвонить</span>
+            <span class="call-btn-text">Позвонить</span>
           </button>
         </div>
       </div>
@@ -68,8 +74,10 @@
       :videoCount="videoCount"
       :audioEnabled="audioEnabled"
       :videoEnabled="videoEnabled"
+      :screenSharing="screenSharing"
       @toggleAudio="toggleAudio"
       @toggleVideo="toggleVideo"
+      @toggleScreen="toggleScreenShare"
       @endCall="endCall"
     />
   </div>
@@ -90,16 +98,17 @@ const {
 } = useWebSocket()
 
 const {
-  inCall, audioEnabled, videoEnabled, localStream,
+  inCall, audioEnabled, videoEnabled, screenSharing, localStream,
   remoteStreams, videoCount,
   startCall, endCall, handleSignal,
-  toggleAudio, toggleVideo, closeAllPeers
+  toggleAudio, toggleVideo, toggleScreenShare, closeAllPeers
 } = useWebRTC(sendSignal, nickname, users)
 
 setSignalHandler(handleSignal)
 
 const text = ref('')
 const messagesEl = ref(null)
+const sidebarOpen = ref(false)
 
 const colors = [
   '#e17076', '#7bc862', '#e5ca77', '#65aadd',
@@ -153,6 +162,11 @@ watch(messages, () => {
 .chat-layout {
   display: flex;
   height: 100%;
+  position: relative;
+}
+
+.sidebar-overlay {
+  display: none;
 }
 
 .chat-main {
@@ -165,12 +179,35 @@ watch(messages, () => {
 .chat-header {
   height: 56px;
   min-height: 56px;
-  padding: 0 16px;
+  padding: 0 12px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
   background: var(--tg-bg-header);
   border-bottom: 1px solid var(--tg-border);
+}
+
+.menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--tg-text-header);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.menu-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.chat-header-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .chat-header-info h2 {
@@ -200,6 +237,7 @@ watch(messages, () => {
   cursor: pointer;
   transition: all 0.2s;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
 }
 
 .call-btn:hover {
@@ -280,5 +318,61 @@ watch(messages, () => {
   background: var(--tg-bg-header);
   color: var(--tg-text-secondary);
   cursor: not-allowed;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .menu-btn {
+    display: flex;
+  }
+
+  .chat-layout :deep(.sidebar) {
+    position: fixed;
+    left: -280px;
+    top: 0;
+    bottom: 0;
+    z-index: 200;
+    width: 280px;
+    transition: left 0.25s ease;
+    box-shadow: none;
+  }
+
+  .chat-layout :deep(.sidebar.open) {
+    left: 0;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 199;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+
+  .sidebar-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .call-btn {
+    padding: 10px 14px;
+  }
+
+  .call-btn-text {
+    display: none;
+  }
+
+  .chat-input-area {
+    padding: 6px 6px 8px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
+  .messages-inner {
+    padding: 8px 8px;
+  }
 }
 </style>

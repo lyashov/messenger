@@ -57,6 +57,20 @@
         </svg>
       </button>
 
+      <button
+        class="ctrl-btn"
+        :class="{ active: screenSharing }"
+        @click="$emit('toggleScreen')"
+        title="Поделиться экраном"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+          <path d="M8 21h8m-4-4v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path v-if="!screenSharing" d="M9 13l3-3 3 3m-3-3v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path v-else d="M9 10l3 3 3-3m-3 3V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
       <button class="ctrl-btn hangup" @click="endCall" title="Завершить звонок">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M10.68 13.31a16 16 0 01-3.13-4.13c-.27-.52-.15-1.14.27-1.55l.46-.47a1.5 1.5 0 000-2.12L6.16 2.92a1.5 1.5 0 00-2.12 0l-.73.73C1.5 5.46 1.33 8.55 3.46 12.17a24.4 24.4 0 008.37 8.37c3.62 2.13 6.71 1.96 8.52.15l.73-.73a1.5 1.5 0 000-2.12l-2.12-2.12a1.5 1.5 0 00-2.12 0l-.47.46c-.41.42-1.03.54-1.55.27a16 16 0 01-4.13-3.13z" stroke="currentColor" stroke-width="2"/>
@@ -67,7 +81,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
   nickname: String,
@@ -75,10 +89,11 @@ const props = defineProps({
   remoteStreams: Object,
   videoCount: Number,
   audioEnabled: Boolean,
-  videoEnabled: Boolean
+  videoEnabled: Boolean,
+  screenSharing: Boolean
 })
 
-const emit = defineEmits(['toggleAudio', 'toggleVideo', 'endCall'])
+const emit = defineEmits(['toggleAudio', 'toggleVideo', 'toggleScreen', 'endCall'])
 
 const localVideoEl = ref(null)
 const duration = ref(0)
@@ -87,6 +102,11 @@ let timer = null
 const formattedDuration = ref('00:00')
 
 onMounted(() => {
+  // Attach local stream after DOM is ready
+  if (localVideoEl.value && props.localStream) {
+    localVideoEl.value.srcObject = props.localStream
+  }
+
   timer = setInterval(() => {
     duration.value++
     const m = String(Math.floor(duration.value / 60)).padStart(2, '0')
@@ -100,10 +120,12 @@ onUnmounted(() => {
 })
 
 watch(() => props.localStream, (stream) => {
-  if (localVideoEl.value && stream) {
-    localVideoEl.value.srcObject = stream
-  }
-}, { immediate: true })
+  nextTick(() => {
+    if (localVideoEl.value && stream) {
+      localVideoEl.value.srcObject = stream
+    }
+  })
+})
 
 function setStream(el, stream) {
   if (el && el.srcObject !== stream) {
@@ -124,6 +146,7 @@ function endCall() { emit('endCall') }
   z-index: 1000;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .call-header {
@@ -132,6 +155,8 @@ function endCall() { emit('endCall') }
   align-items: center;
   gap: 16px;
   background: rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+  color: #fff;
 }
 
 .back-btn {
@@ -167,6 +192,7 @@ function endCall() { emit('endCall') }
 
 .call-grid {
   flex: 1;
+  min-height: 0;
   display: grid;
   gap: 4px;
   padding: 4px;
@@ -180,12 +206,15 @@ function endCall() { emit('endCall') }
 
 .video-cell {
   position: relative;
-  background: var(--tg-bg);
+  background: #1a1f2e;
   border-radius: 12px;
   overflow: hidden;
+  min-height: 0;
 }
 
 .video-cell video {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -199,7 +228,9 @@ function endCall() { emit('endCall') }
   border-radius: 6px;
   background: rgba(0, 0, 0, 0.55);
   font-size: 13px;
+  color: #fff;
   backdrop-filter: blur(4px);
+  z-index: 2;
 }
 
 .video-off {
@@ -208,7 +239,8 @@ function endCall() { emit('endCall') }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--tg-bg-header);
+  background: #1a1f2e;
+  z-index: 1;
 }
 
 .video-off-avatar {
@@ -225,12 +257,13 @@ function endCall() { emit('endCall') }
 }
 
 .call-controls {
-  padding: 20px;
+  padding: 16px 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 16px;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
 }
 
 .ctrl-btn {
@@ -242,8 +275,8 @@ function endCall() { emit('endCall') }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--tg-bg-header);
-  color: var(--tg-text);
+  background: #2a3040;
+  color: #e0e0e0;
   transition: all 0.2s;
 }
 
@@ -256,6 +289,11 @@ function endCall() { emit('endCall') }
   color: #fff;
 }
 
+.ctrl-btn.active {
+  background: var(--tg-blue);
+  color: #fff;
+}
+
 .ctrl-btn.hangup {
   width: 60px;
   height: 60px;
@@ -265,5 +303,60 @@ function endCall() { emit('endCall') }
 
 .ctrl-btn.hangup:hover {
   background: #dc2626;
+}
+
+@media (max-width: 768px) {
+  .call-header {
+    padding: 8px 12px;
+    padding-top: max(8px, env(safe-area-inset-top));
+    gap: 10px;
+  }
+
+  .back-btn span {
+    display: none;
+  }
+
+  .back-btn {
+    padding: 8px 10px;
+  }
+
+  .call-grid {
+    gap: 2px;
+    padding: 2px;
+  }
+
+  .grid-2 { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+
+  .video-cell {
+    border-radius: 8px;
+  }
+
+  .call-controls {
+    padding: 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    gap: 10px;
+  }
+
+  .ctrl-btn {
+    width: 46px;
+    height: 46px;
+  }
+
+  .ctrl-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .ctrl-btn.hangup {
+    width: 52px;
+    height: 52px;
+  }
+
+  .video-off-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+  }
 }
 </style>
