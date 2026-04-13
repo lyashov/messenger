@@ -1,17 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Background: rounded square, Telegram blue -->
-  <rect width="512" height="512" rx="115" fill="#2AABEE"/>
+  <!-- Telegram blue circle background -->
+  <circle cx="256" cy="256" r="256" fill="#2AABEE"/>
 
   <!-- Telegram paper plane (white) -->
-  <path d="M96 256 L416 120 L316 400 L236 308 Z" fill="white" opacity="0.95"/>
-  <path d="M236 308 L220 370 L196 318 Z" fill="#d0eeff"/>
-  <path d="M236 308 L316 400 L260 340 Z" fill="#b8e0f7"/>
+  <path d="M106,256 L404,146 L310,370 L230,295 Z" fill="white"/>
+  <path d="M230,295 L216,346 L194,302 Z" fill="rgba(255,255,255,0.6)"/>
+  <path d="M230,295 L310,370 L262,325 Z" fill="rgba(255,255,255,0.75)"/>
 
-  <!-- MAX badge: orange circle bottom-right -->
-  <circle cx="370" cy="370" r="110" fill="#FF8C00"/>
-
-  <!-- Letter M in white inside badge -->
-  <text x="370" y="415" text-anchor="middle"
-        font-family="Arial Black, Arial, sans-serif"
-        font-weight="900" font-size="130" fill="white">M</text>
+  <!-- MAX in red bold text -->
+  <text
+    x="256" y="430"
+    text-anchor="middle"
+    font-family="Arial Black, Arial, sans-serif"
+    font-weight="900"
+    font-size="148"
+    fill="#FF1A1A"
+    letter-spacing="-4"
+  >MAX</text>
 </svg>
