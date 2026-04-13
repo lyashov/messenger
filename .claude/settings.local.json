@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 root@213.171.4.237 \"echo 'connected' && docker --version && docker compose version\")",
+      "Bash(brew install:*)",
+      "Bash(brew uninstall:*)",
+      "Bash(SSHPASS='agA+WN#L_P9e,6' sshpass -e ssh -o StrictHostKeyChecking=no root@213.171.4.237 \"echo 'connected' && docker --version && docker compose version\")",
+      "Bash(SSHPASS='agA+WN#L_P9e,6' sshpass -e ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no root@213.171.4.237 \"echo ok\")",
+      "Bash(SSHPASS='agA+WN#L_P9e,6' sshpass -e ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no root@213.171.4.237 \"docker --version && docker compose version && ls /opt/ 2>/dev/null\")",
+      "Bash(SSHPASS='agA+WN#L_P9e,6' sshpass -e ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no root@213.171.4.237 \"mkdir -p /opt/messenger\")",
+      "Bash(SSHPASS='agA+WN#L_P9e,6' sshpass -e scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -r /Users/evgeniiliashov/Documents/AI/messenger/* root@213.171.4.237:/opt/messenger/)",
+      "Bash(SSHPASS='agA+WN#L_P9e,6' sshpass -e ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no root@213.171.4.237 \"ls /opt/messenger/\")",
+      "Bash(SSHPASS='agA+WN#L_P9e,6' sshpass -e ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no root@213.171.4.237 \"echo 'DOMAIN=ai-rt.ru' > /opt/messenger/.env && cat /opt/messenger/.env\")",
+      "Bash(SSHPASS='agA+WN#L_P9e,6' sshpass -e ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no root@213.171.4.237 \"cd /opt/messenger && docker compose up -d --build 2>&1\")",
+      "Bash(SSHPASS='agA+WN#L_P9e,6' sshpass -e ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no root@213.171.4.237 \"ss -tlnp | grep -E ':80|:443'\")",
+      "Bash(sshpass -e scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no /Users/evgeniiliashov/Documents/AI/messenger/Caddyfile /Users/evgeniiliashov/Documents/AI/messenger/docker-compose.yml root@213.171.4.237:/opt/messenger/)",
+      "Bash(sshpass -e scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -O /Users/evgeniiliashov/Documents/AI/messenger/Caddyfile /Users/evgeniiliashov/Documents/AI/messenger/docker-compose.yml root@213.171.4.237:/opt/messenger/)",
+      "Bash(sshpass -e ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no root@213.171.4.237 'cd /opt/messenger && docker compose down && docker compose up -d 2>&1')",
+      "Bash(sshpass -e ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no root@213.171.4.237 'sleep 8 && docker compose -f /opt/messenger/docker-compose.yml ps && echo '\\\\''---CADDY LOGS---'\\\\'' && docker compose -f /opt/messenger/docker-compose.yml logs caddy 2>&1 | tail -30')",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} %{ssl_verify_result}\" https://ai-rt.ru)",
+      "Bash(git -C /Users/evgeniiliashov/Documents/AI/messenger remote -v)",
+      "Bash(sshpass -e scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -O -r /Users/evgeniiliashov/Documents/AI/messenger/src /Users/evgeniiliashov/Documents/AI/messenger/deploy /Users/evgeniiliashov/Documents/AI/messenger/pom.xml /Users/evgeniiliashov/Documents/AI/messenger/Dockerfile /Users/evgeniiliashov/Documents/AI/messenger/docker-compose.yml /Users/evgeniiliashov/Documents/AI/messenger/Caddyfile /Users/evgeniiliashov/Documents/AI/messenger/.gitignore root@213.171.4.237:/opt/messenger/)",
+      "Bash(sshpass -e scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -O /Users/evgeniiliashov/Documents/AI/messenger/deploy/deploy.sh root@213.171.4.237:/opt/messenger/deploy/deploy.sh)",
+      "Bash(sshpass -e ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no root@213.171.4.237 ':*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://ai-rt.ru)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(sshpass -e scp -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -O -r /Users/evgeniiliashov/Documents/AI/messenger/frontend /Users/evgeniiliashov/Documents/AI/messenger/src /Users/evgeniiliashov/Documents/AI/messenger/Dockerfile /Users/evgeniiliashov/Documents/AI/messenger/.gitignore /Users/evgeniiliashov/Documents/AI/messenger/deploy root@213.171.4.237:/opt/messenger/)"
+    ]
+  }
+}
