@@ -1,7 +1,8 @@
 import { ref, reactive } from 'vue'
 
-const screen = ref('join')
-const nickname = ref('')
+const savedNick = localStorage.getItem('nickname')
+const screen = ref(savedNick ? 'chat' : 'join')
+const nickname = ref(savedNick || '')
 const error = ref('')
 const messages = reactive([])
 const users = reactive([])
@@ -30,8 +31,12 @@ export function useWebSocket() {
 
     ws.onclose = () => {
       if (screen.value === 'chat') {
-        screen.value = 'join'
-        error.value = 'Соединение потеряно. Обновите страницу.'
+        // Try to reconnect automatically
+        setTimeout(() => {
+          if (screen.value === 'chat' && nickname.value) {
+            connect()
+          }
+        }, 2000)
       }
     }
   }
@@ -64,6 +69,7 @@ export function useWebSocket() {
       return
     }
     error.value = ''
+    localStorage.setItem('nickname', nickname.value)
     screen.value = 'chat'
     connect()
   }
@@ -71,7 +77,9 @@ export function useWebSocket() {
   function leave() {
     if (ws) ws.close()
     ws = null
+    localStorage.removeItem('nickname')
     screen.value = 'join'
+    nickname.value = ''
     messages.splice(0)
     users.splice(0)
   }
@@ -85,6 +93,11 @@ export function useWebSocket() {
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify(data))
     }
+  }
+
+  // Auto-connect if nickname was saved
+  if (savedNick && !ws) {
+    connect()
   }
 
   return {

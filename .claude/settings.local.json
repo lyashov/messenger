@@ -34,7 +34,11 @@
       "Bash(sshpass -e rsync -avz -e 'ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no' /Users/evgeniiliashov/Documents/AI/messenger/.dockerignore root@213.171.4.237:/opt/messenger/)",
       "Bash(sshpass -e ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o ServerAliveInterval=30 root@213.171.4.237 ':*)",
       "Bash(curl -s https://ai-rt.ru)",
-      "Bash(sshpass -e ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o ServerAliveInterval=15 root@213.171.4.237 ':*)"
+      "Bash(sshpass -e ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no -o ServerAliveInterval=15 root@213.171.4.237 ':*)",
+      "Bash(sshpass -e rsync -avz --delete -e 'ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=password -o PubkeyAuthentication=no' /Users/evgeniiliashov/Documents/AI/messenger/src/main/resources/static/ root@213.171.4.237:/opt/messenger/src/main/resources/static/)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)"
     ]
   }
 }
