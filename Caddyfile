@@ -1,0 +1,8 @@
+{$DOMAIN} {
+    tls {
+        issuer acme {
+            disable_http_challenge
+        }
+    }
+    reverse_proxy app:8080
+}

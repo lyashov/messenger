@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messenger</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a1a2e; color: #e0e0e0; height: 100vh; }
+
+        /* Join Screen */
+        .join-screen { display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .join-card { background: #16213e; padding: 40px; border-radius: 12px; text-align: center; min-width: 320px; }
+        .join-card h1 { margin-bottom: 24px; color: #e94560; font-size: 24px; }
+        .join-card input { width: 100%; padding: 12px; border: 1px solid #0f3460; border-radius: 8px; background: #1a1a2e; color: #e0e0e0; font-size: 16px; outline: none; margin-bottom: 16px; }
+        .join-card input:focus { border-color: #e94560; }
+        .join-card .error { color: #e94560; margin-bottom: 12px; font-size: 14px; }
+
+        /* Chat Screen */
+        .chat-screen { display: flex; height: 100vh; }
+        .sidebar { width: 200px; background: #16213e; padding: 16px; border-right: 1px solid #0f3460; display: flex; flex-direction: column; }
+        .sidebar h3 { color: #e94560; margin-bottom: 12px; font-size: 14px; text-transform: uppercase; }
+        .user-list { flex: 1; }
+        .user-item { padding: 8px; border-radius: 6px; margin-bottom: 4px; font-size: 14px; background: #1a1a2e; }
+        .user-item.me { color: #e94560; font-weight: bold; }
+
+        .main { flex: 1; display: flex; flex-direction: column; }
+        .header { background: #16213e; padding: 12px 20px; border-bottom: 1px solid #0f3460; display: flex; align-items: center; justify-content: space-between; }
+        .header h2 { font-size: 18px; }
+        .header-buttons { display: flex; gap: 8px; }
+
+        .messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+        .msg { max-width: 70%; padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.4; }
+        .msg.mine { align-self: flex-end; background: #e94560; color: #fff; }
+        .msg.other { align-self: flex-start; background: #16213e; }
+        .msg.system { align-self: center; background: transparent; color: #666; font-size: 12px; font-style: italic; }
+        .msg .nick { font-weight: bold; font-size: 12px; margin-bottom: 4px; color: #aaa; }
+        .msg.mine .nick { color: #ffcdd2; }
+        .msg .time { font-size: 11px; color: #888; margin-top: 4px; text-align: right; }
+        .msg.mine .time { color: #ffcdd2; }
+
+        .input-area { padding: 16px; background: #16213e; border-top: 1px solid #0f3460; display: flex; gap: 8px; }
+        .input-area input { flex: 1; padding: 12px; border: 1px solid #0f3460; border-radius: 8px; background: #1a1a2e; color: #e0e0e0; font-size: 14px; outline: none; }
+        .input-area input:focus { border-color: #e94560; }
+
+        /* Buttons */
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.85; }
+        .btn-primary { background: #e94560; color: #fff; }
+        .btn-success { background: #4caf50; color: #fff; }
+        .btn-danger { background: #f44336; color: #fff; }
+        .btn-secondary { background: #0f3460; color: #e0e0e0; }
+
+        /* Call Overlay */
+        .call-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #0a0a1a; z-index: 100; display: flex; flex-direction: column; }
+        .call-grid { flex: 1; display: grid; gap: 8px; padding: 8px; }
+        .call-grid.count-1 { grid-template-columns: 1fr; }
+        .call-grid.count-2 { grid-template-columns: 1fr 1fr; }
+        .call-grid.count-3 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+        .call-grid.count-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+        .video-container { position: relative; background: #1a1a2e; border-radius: 8px; overflow: hidden; }
+        .video-container video { width: 100%; height: 100%; object-fit: cover; }
+        .video-label { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.6); padding: 4px 10px; border-radius: 4px; font-size: 13px; }
+        .call-controls { padding: 16px; display: flex; justify-content: center; gap: 12px; background: #16213e; }
+        .call-btn { width: 48px; height: 48px; border-radius: 50%; border: none; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+        .call-btn.active { background: #0f3460; color: #e0e0e0; }
+        .call-btn.inactive { background: #f44336; color: #fff; }
+        .call-btn.hangup { background: #f44336; color: #fff; width: 56px; height: 56px; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Join Screen -->
+        <div v-if="screen === 'join'" class="join-screen">
+            <div class="join-card">
+                <h1>Messenger</h1>
+                <div v-if="error" class="error">{{ error }}</div>
+                <input v-model="nickname" @keyup.enter="join" placeholder="Введите никнейм" maxlength="20" autofocus>
+                <button class="btn btn-primary" style="width:100%" @click="join">Войти</button>
+            </div>
+        </div>
+
+        <!-- Chat Screen -->
+        <div v-if="screen === 'chat'" class="chat-screen">
+            <div class="sidebar">
+                <h3>Онлайн ({{ users.length }})</h3>
+                <div class="user-list">
+                    <div v-for="u in users" :key="u" class="user-item" :class="{ me: u === nickname }">
+                        {{ u }}{{ u === nickname ? ' (вы)' : '' }}
+                    </div>
+                </div>
+                <button class="btn btn-secondary" style="width:100%; margin-top:8px" @click="leave">Выйти</button>
+            </div>
+
+            <div class="main">
+                <div class="header">
+                    <h2>Комната</h2>
+                    <div class="header-buttons">
+                        <button v-if="!inCall" class="btn btn-success" @click="startCall">
+                            &#128222; Позвонить
+                        </button>
+                    </div>
+                </div>
+
+                <div class="messages" ref="messagesEl">
+                    <div v-for="(m, i) in messages" :key="i" class="msg"
+                         :class="{ mine: m.nickname === nickname, other: m.nickname !== nickname && m.nickname !== 'Система', system: m.nickname === 'Система' }">
+                        <div v-if="m.nickname !== nickname && m.nickname !== 'Система'" class="nick">{{ m.nickname }}</div>
+                        <div>{{ m.text }}</div>
+                        <div v-if="m.nickname !== 'Система'" class="time">{{ formatTime(m.timestamp) }}</div>
+                    </div>
+                </div>
+
+                <div class="input-area">
+                    <input v-model="message" @keyup.enter="sendMessage" placeholder="Сообщение...">
+                    <button class="btn btn-primary" @click="sendMessage">&#10148;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call Overlay -->
+        <div v-if="inCall" class="call-overlay">
+            <div class="call-grid" :class="'count-' + videoCount">
+                <div class="video-container">
+                    <video ref="localVideo" autoplay playsinline muted></video>
+                    <div class="video-label">{{ nickname }} (вы)</div>
+                </div>
+                <div v-for="(stream, nick) in remoteStreams" :key="nick" class="video-container">
+                    <video autoplay playsinline :ref="el => setVideoStream(el, stream)"></video>
+                    <div class="video-label">{{ nick }}</div>
+                </div>
+            </div>
+            <div class="call-controls">
+                <button class="call-btn" :class="audioEnabled ? 'active' : 'inactive'" @click="toggleAudio" title="Микрофон">
+                    {{ audioEnabled ? '&#127908;' : '&#128263;' }}
+                </button>
+                <button class="call-btn" :class="videoEnabled ? 'active' : 'inactive'" @click="toggleVideo" title="Камера">
+                    {{ videoEnabled ? '&#127909;' : '&#128247;' }}
+                </button>
+                <button class="call-btn hangup" @click="endCall" title="Завершить">
+                    &#128225;
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script>
+    const { createApp, ref, reactive, nextTick, computed, onUnmounted } = Vue;
+
+    createApp({
+        setup() {
+            const screen = ref('join');
+            const nickname = ref('');
+            const message = ref('');
+            const error = ref('');
+            const messages = reactive([]);
+            const users = reactive([]);
+            const messagesEl = ref(null);
+            const localVideo = ref(null);
+
+            let ws = null;
+
+            // Call state
+            const inCall = ref(false);
+            const audioEnabled = ref(true);
+            const videoEnabled = ref(true);
+            const localStream = ref(null);
+            const peerConnections = {};
+            const remoteStreams = reactive({});
+
+            const rtcConfig = {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' }
+                ]
+            };
+
+            const videoCount = computed(() => 1 + Object.keys(remoteStreams).length);
+
+            function connect() {
+                const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+                ws = new WebSocket(`${proto}//${location.host}/ws`);
+
+                ws.onopen = () => {
+                    ws.send(JSON.stringify({ type: 'join', nickname: nickname.value }));
+                };
+
+                ws.onmessage = (event) => {
+                    const msg = JSON.parse(event.data);
+                    handleMessage(msg);
+                };
+
+                ws.onclose = () => {
+                    if (screen.value === 'chat') {
+                        screen.value = 'join';
+                        error.value = 'Соединение потеряно';
+                        cleanup();
+                    }
+                };
+            }
+
+            function handleMessage(msg) {
+                switch (msg.type) {
+                    case 'users':
+                        users.splice(0, users.length, ...msg.users);
+                        break;
+                    case 'chat':
+                        messages.push(msg);
+                        nextTick(() => {
+                            if (messagesEl.value) {
+                                messagesEl.value.scrollTop = messagesEl.value.scrollHeight;
+                            }
+                        });
+                        break;
+                    case 'error':
+                        error.value = msg.text;
+                        if (screen.value === 'join') ws.close();
+                        break;
+                    case 'offer':
+                        handleOffer(msg);
+                        break;
+                    case 'answer':
+                        handleAnswer(msg);
+                        break;
+                    case 'ice':
+                        handleIce(msg);
+                        break;
+                }
+            }
+
+            function join() {
+                const nick = nickname.value.trim();
+                if (!nick) { error.value = 'Введите никнейм'; return; }
+                error.value = '';
+                screen.value = 'chat';
+                connect();
+            }
+
+            function leave() {
+                cleanup();
+                if (ws) ws.close();
+                screen.value = 'join';
+                messages.splice(0);
+                users.splice(0);
+            }
+
+            function sendMessage() {
+                const text = message.value.trim();
+                if (!text || !ws) return;
+                ws.send(JSON.stringify({ type: 'chat', nickname: nickname.value, text }));
+                message.value = '';
+            }
+
+            function formatTime(ts) {
+                if (!ts) return '';
+                const d = new Date(ts);
+                return d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+            }
+
+            // --- WebRTC ---
+
+            async function startCall() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+                    localStream.value = stream;
+                    inCall.value = true;
+
+                    nextTick(() => {
+                        if (localVideo.value) {
+                            localVideo.value.srcObject = stream;
+                        }
+                    });
+
+                    // Create peer connections for all other users
+                    for (const user of users) {
+                        if (user !== nickname.value) {
+                            const pc = createPeer(user);
+                            const offer = await pc.createOffer();
+                            await pc.setLocalDescription(offer);
+                            ws.send(JSON.stringify({
+                                type: 'offer',
+                                nickname: nickname.value,
+                                target: user,
+                                sdp: offer.sdp
+                            }));
+                        }
+                    }
+                } catch (e) {
+                    console.error('Failed to start call:', e);
+                    error.value = 'Не удалось получить доступ к камере/микрофону';
+                }
+            }
+
+            function createPeer(remoteNick) {
+                const pc = new RTCPeerConnection(rtcConfig);
+                peerConnections[remoteNick] = pc;
+
+                if (localStream.value) {
+                    localStream.value.getTracks().forEach(track => {
+                        pc.addTrack(track, localStream.value);
+                    });
+                }
+
+                pc.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        ws.send(JSON.stringify({
+                            type: 'ice',
+                            nickname: nickname.value,
+                            target: remoteNick,
+                            candidate: event.candidate
+                        }));
+                    }
+                };
+
+                pc.ontrack = (event) => {
+                    remoteStreams[remoteNick] = event.streams[0];
+                };
+
+                pc.onconnectionstatechange = () => {
+                    if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+                        removePeer(remoteNick);
+                    }
+                };
+
+                return pc;
+            }
+
+            async function handleOffer(msg) {
+                // Auto-accept: get media if not in call yet
+                if (!inCall.value) {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+                        localStream.value = stream;
+                        inCall.value = true;
+                        nextTick(() => {
+                            if (localVideo.value) {
+                                localVideo.value.srcObject = stream;
+                            }
+                        });
+                    } catch (e) {
+                        console.error('Failed to get media for incoming call:', e);
+                        return;
+                    }
+                }
+
+                const pc = createPeer(msg.nickname);
+                await pc.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp: msg.sdp }));
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+
+                ws.send(JSON.stringify({
+                    type: 'answer',
+                    nickname: nickname.value,
+                    target: msg.nickname,
+                    sdp: answer.sdp
+                }));
+            }
+
+            async function handleAnswer(msg) {
+                const pc = peerConnections[msg.nickname];
+                if (pc) {
+                    await pc.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp: msg.sdp }));
+                }
+            }
+
+            async function handleIce(msg) {
+                const pc = peerConnections[msg.nickname];
+                if (pc && msg.candidate) {
+                    try {
+                        await pc.addIceCandidate(new RTCIceCandidate(msg.candidate));
+                    } catch (e) {
+                        console.error('Failed to add ICE candidate:', e);
+                    }
+                }
+            }
+
+            function removePeer(nick) {
+                if (peerConnections[nick]) {
+                    peerConnections[nick].close();
+                    delete peerConnections[nick];
+                }
+                delete remoteStreams[nick];
+            }
+
+            function endCall() {
+                for (const nick of Object.keys(peerConnections)) {
+                    removePeer(nick);
+                }
+                if (localStream.value) {
+                    localStream.value.getTracks().forEach(t => t.stop());
+                    localStream.value = null;
+                }
+                inCall.value = false;
+            }
+
+            function toggleAudio() {
+                if (localStream.value) {
+                    localStream.value.getAudioTracks().forEach(t => { t.enabled = !t.enabled; });
+                    audioEnabled.value = !audioEnabled.value;
+                }
+            }
+
+            function toggleVideo() {
+                if (localStream.value) {
+                    localStream.value.getVideoTracks().forEach(t => { t.enabled = !t.enabled; });
+                    videoEnabled.value = !videoEnabled.value;
+                }
+            }
+
+            function setVideoStream(el, stream) {
+                if (el && el.srcObject !== stream) {
+                    el.srcObject = stream;
+                }
+            }
+
+            function cleanup() {
+                endCall();
+            }
+
+            return {
+                screen, nickname, message, error, messages, users, messagesEl, localVideo,
+                inCall, audioEnabled, videoEnabled, remoteStreams, videoCount,
+                join, leave, sendMessage, formatTime,
+                startCall, endCall, toggleAudio, toggleVideo, setVideoStream
+            };
+        }
+    }).mount('#app');
+    </script>
+</body>
+</html>
