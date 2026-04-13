@@ -163,6 +163,9 @@ watch(messages, () => {
   display: flex;
   height: 100%;
   position: relative;
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 .sidebar-overlay {
@@ -367,8 +370,7 @@ watch(messages, () => {
   }
 
   .chat-input-area {
-    padding: 6px 6px 8px;
-    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    padding: 6px 6px max(12px, env(safe-area-inset-bottom));
   }
 
   .messages-inner {

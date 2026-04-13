@@ -151,6 +151,7 @@ function endCall() { emit('endCall') }
 
 .call-header {
   padding: 12px 16px;
+  padding-top: max(12px, env(safe-area-inset-top));
   display: flex;
   align-items: center;
   gap: 16px;

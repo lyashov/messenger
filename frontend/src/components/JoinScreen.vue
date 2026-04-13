@@ -53,6 +53,10 @@ function handleJoin() {
   height: 100%;
   background: var(--tg-bg-secondary);
   padding: 16px;
+  padding-top: max(16px, env(safe-area-inset-top));
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
 }
 
 .join-card {
