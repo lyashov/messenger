@@ -54,9 +54,17 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         String nick = msg.nickname();
 
         if (nickToSession.containsKey(nick)) {
-            sendTo(session, new ChatMessage("error", null, null,
-                    "Никнейм уже занят", null, null, null, 0));
-            return;
+            WebSocketSession oldSession = nickToSession.get(nick);
+            if (oldSession != null && oldSession.isOpen()) {
+                // Nickname genuinely in use by another active session
+                sendTo(session, new ChatMessage("error", null, null,
+                        "Никнейм уже занят", null, null, null, 0));
+                return;
+            }
+            // Old session is dead (page refresh / reconnect) — evict stale entry
+            nickToSession.remove(nick);
+            sessionToNick.remove(oldSession);
+            log.info("Evicted stale session for: {}", nick);
         }
 
         if (sessionToNick.size() >= MAX_USERS) {
